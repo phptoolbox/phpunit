@@ -16,7 +16,8 @@
         "fabpot/goutte": "@dev"
     },
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "toolbox/core": "@dev"
     },
     "autoload": {
         "psr-0": { "toolbox\\phpunit": "" }
