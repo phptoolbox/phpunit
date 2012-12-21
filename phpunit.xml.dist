@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
          colors="true"
@@ -9,11 +8,13 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="./vendor/autoload.php">
+         bootstrap="autoload.php"
+         verbose="true"
+>
+    <php>
+        <const name="TOOLBOX_PHPUNIT_BASE_TEST_URL" value="http://127.0.0.1:8080"/>
+    </php>
 
-    <goutte>
-        <url>localhost:8080</url>
-    </goutte>
     <testsuites>
         <testsuite name="Toolbox Test Suite">
             <directory>./tests/</directory>
