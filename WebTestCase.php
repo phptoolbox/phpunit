@@ -13,126 +13,95 @@ namespace toolbox\phpunit;
 
 use PHPUnit_Framework_TestCase;
 
-use toolbox\phpunit\Client;
-use toolbox\phpunit\element\Select;
+use toolbox\phpunit\Browser;
 
 /**
  * Description of WebTestCase
  *
  * @method \toolbox\phpunit\Crawler filter(string $selector) Filters the list of nodes with a CSS selector.
+ * @method \toolbox\phpunit\Crawler filterXPath(string $selector) Filters the list of nodes with an XPath expression.
+ * @method integer statusCode() Get HTTP Response Status Code
  * @author Anthonius Munthi <me@itstoni.com>
  */
 class WebTestCase extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var toolbox\phpunit\Client
+     * @var toolbox\phpunit\Browser
      */
-    private $client;
+    private $browser;
 
-    private $method = "GET";
+    private $baseUrl = null;
 
-    public function __construct($name = NULL, array $data = array(), $dataName = '')
+    /**
+     * @var \toolbox\phpunit\Crawler
+     */
+    private $crawler;
+
+    /**
+     * @return \toolbox\phpunit\Browser
+     */
+    protected function getBrowser()
     {
-        parent::__construct($name, $data, $dataName);
-        $this->parameters = array(
-            'host' => 'localhost',
-            'port' => 4444,
-            'timeout' => 10
-        );
-    }
-
-    public function url($url=null)
-    {
-        if(!is_null($url)){
-            $this->getClient()->setUrl($url);
+        if(!is_object($this->browser)){
+            $this->browser = new Browser();
         }
-        return $this->getClient()->getUrl();
+        return $this->browser;
     }
 
-    /**
-     * @return toolbox\phpunit\Client
-     */
-    protected function getClient()
+    public function setBaseUrl($url)
     {
-        if(!is_object($this->client)){
-            $this->client = new Client();
+        $this->baseUrl = $url;
+    }
+
+    public function open($uri = null, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
+    {
+        if(false===strpos($uri, $this->baseUrl) && false===strpos($uri,'http://')){
+            $sep = strpos($uri, '/')===0 ? '':'/';
+            $uri = $this->baseUrl.$sep.$uri;
         }
-        return $this->client;
+        $this->crawler = $this->getBrowser()->open($uri, $parameters, $files, $server, $content, $changeHistory);
     }
 
-    /**
-     * @return toolbox\phpunit\Crawler
-     */
-    protected function getCrawler()
+    public function statusCode()
     {
-        return $this->getClient()->request($this->method);
+        return $this->getBrowser()->getResponse()->getStatus();
     }
 
-    /**
-     * @return text
-     */
     public function title()
     {
-        return $this->by('title')->text();
+        return $this->crawler->filter('title')->text();
     }
 
     /**
-     *
-     * @param   type $selector
-     * @param   type $strategy
-     * @return  \toolbox\phpunit\Crawler
-     */
-    public function by($selector,$strategy=null)
-    {
-        return $this->getCrawler()->filter($selector);
-    }
-
-    /**
-     * @param   string  $id
-     * @return  \toolbox\phpunit\Crawler
-     */
-    public function byId($id)
-    {
-        if(false===  strpos($id, '#')){
-            $id = '#'.$id;
-        }
-        return $this->getCrawler()->filter($id);
-    }
-
-    /**
-     * @param  string  $name
      * @return \toolbox\phpunit\Crawler
      */
-    public function byName($name)
+    public function body()
     {
-        return $this->getCrawler()->filter('[name='.$name.']');
+        return $this->crawler->filter('body');
     }
 
-    /**
-     * @param  string  $class
-     * @return \toolbox\phpunit\Crawler
-     */
-    public function byClass($class)
+    public function assertTitle($expected,$message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE)
     {
-        $class = (1!==strpos($class,'.')) ? '.'.$class:$class;
-        return $this->getCrawler()->filter($class);
+        $this->assertEquals($expected, $this->title(), $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
     }
 
-    /**
-     * @param   string      $selector
-     * @return  \toolbox\phpunit\element\Select
-     */
-    public function select($selector)
+    public function assertBodyContains($expected, $message = '', $ignoreCase = FALSE, $checkForObjectIdentity = TRUE)
     {
-        $crawler = $this->getCrawler()->filter($selector);
-        return new Select($crawler);
+        $haystack = $this->body()->text();
+        $this->assertContains($expected, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
     }
 
+    public function assertStatusCode($expected,$message)
+    {
+        $this->assertEquals($expected,$this->getBrowser()->getResponse()->getStatus(),$message);
+    }
     public function __call($name, $arguments)
     {
-        if(method_exists($this->getCrawler(),$name)){
-            return call_user_func_array(array($this->getCrawler(),$name), $arguments);
+        $crawler = $this->crawler;
+        if(is_object($crawler) && method_exists($crawler, $name)){
+            return call_user_func_array(array($crawler,$name), $arguments);
         }
+
         $this->markTestIncomplete("Method not exists: ".__CLASS__.'::'.$name);
     }
 }

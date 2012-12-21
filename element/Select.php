@@ -13,13 +13,14 @@ namespace toolbox\phpunit\element;
 
 use toolbox\phpunit\Crawler;
 
+use DOMElement;
 
 /**
  * Description of Select
  *
  * @author Anthonius Munthi <me@itstoni.com>
  */
-class Select
+class Select extends DOMElement
 {
     private $crawler;
 
@@ -41,16 +42,6 @@ class Select
 
     public function clearSelectedOptions()
     {
-        $values = $this->crawler->filter('option')->each(function(&$node,$i){
-            $node->setAttribute('selected','false');
-            return $node;
-        });
-
-        $form = $this->crawler->parents()->form();
-        $x =  $form->getPhpValues();
-        $form['theSelect']->select(array());
-        
-        //$form['theSelect[o1]'];
     }
 }
 

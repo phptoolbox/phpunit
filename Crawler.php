@@ -20,7 +20,6 @@ use Symfony\Component\DomCrawler\Crawler as BaseCrawler;
  */
 class Crawler extends BaseCrawler
 {
-
     public function text()
     {
         return trim(parent::text());
