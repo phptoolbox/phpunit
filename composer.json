@@ -22,6 +22,7 @@
     "autoload": {
         "psr-0": { "toolbox\\phpunit": "" }
     },
+    "target-dir": "toolbox/core",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"
