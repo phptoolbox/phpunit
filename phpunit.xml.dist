@@ -11,6 +11,9 @@
          syntaxCheck="false"
          bootstrap="./vendor/autoload.php">
 
+    <goutte>
+        <url>localhost:8080</url>
+    </goutte>
     <testsuites>
         <testsuite name="Toolbox Test Suite">
             <directory>./tests/</directory>

@@ -12,24 +12,24 @@
 namespace toolbox\phpunit;
 
 use PHPUnit_Framework_TestCase;
+
 use toolbox\phpunit\Client;
+use toolbox\phpunit\element\Select;
 
 /**
  * Description of WebTestCase
  *
+ * @method \toolbox\phpunit\Crawler filter(string $selector) Filters the list of nodes with a CSS selector.
  * @author Anthonius Munthi <me@itstoni.com>
  */
 class WebTestCase extends PHPUnit_Framework_TestCase
 {
     /**
-     * Selenium compatibility only
-     */
-    const VERSION = '1.0.0';
-
-    /**
      * @var toolbox\phpunit\Client
      */
     private $client;
+
+    private $method = "GET";
 
     public function __construct($name = NULL, array $data = array(), $dataName = '')
     {
@@ -60,16 +60,80 @@ class WebTestCase extends PHPUnit_Framework_TestCase
         return $this->client;
     }
 
+    /**
+     * @return toolbox\phpunit\Crawler
+     */
+    protected function getCrawler()
+    {
+        return $this->getClient()->request($this->method);
+    }
+
+    /**
+     * @return text
+     */
     public function title()
     {
-        $this->getRequest();
+        return $this->by('title')->text();
+    }
+
+    /**
+     *
+     * @param   type $selector
+     * @param   type $strategy
+     * @return  \toolbox\phpunit\Crawler
+     */
+    public function by($selector,$strategy=null)
+    {
+        return $this->getCrawler()->filter($selector);
+    }
+
+    /**
+     * @param   string  $id
+     * @return  \toolbox\phpunit\Crawler
+     */
+    public function byId($id)
+    {
+        if(false===  strpos($id, '#')){
+            $id = '#'.$id;
+        }
+        return $this->getCrawler()->filter($id);
+    }
+
+    /**
+     * @param  string  $name
+     * @return \toolbox\phpunit\Crawler
+     */
+    public function byName($name)
+    {
+        return $this->getCrawler()->filter('[name='.$name.']');
+    }
+
+    /**
+     * @param  string  $class
+     * @return \toolbox\phpunit\Crawler
+     */
+    public function byClass($class)
+    {
+        $class = (1!==strpos($class,'.')) ? '.'.$class:$class;
+        return $this->getCrawler()->filter($class);
+    }
+
+    /**
+     * @param   string      $selector
+     * @return  \toolbox\phpunit\element\Select
+     */
+    public function select($selector)
+    {
+        $crawler = $this->getCrawler()->filter($selector);
+        return new Select($crawler);
     }
 
     public function __call($name, $arguments)
     {
-        if(false===  method_exists($this, $name)){
-            $this->markTestIncomplete("Method not exists: ".__CLASS__.'::'.$name);
+        if(method_exists($this->getCrawler(),$name)){
+            return call_user_func_array(array($this->getCrawler(),$name), $arguments);
         }
+        $this->markTestIncomplete("Method not exists: ".__CLASS__.'::'.$name);
     }
 }
 

@@ -18,9 +18,22 @@ use toolbox\phpunit\WebTestCase;
  *
  * @author Anthonius Munthi <me@itstoni.com>
  */
-class BaseTestCase extends WebTestCase
+abstract class BaseTestCase extends WebTestCase
 {
-    
+    protected $baseUrl;
+
+    public function setUp()
+    {
+        $this->baseUrl = TOOLBOX_PHPUNIT_TESTS_URL;
+    }
+
+    public function url($url=null)
+    {
+        if(false===  strpos($url, $this->baseUrl)){
+            $url = !is_null($url) ? $this->baseUrl.'/'.$url:$url;
+        }
+        return parent::url($url);
+    }
 }
 
 ?>
