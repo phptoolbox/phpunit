@@ -37,11 +37,10 @@ class WebTestCaseTest extends BaseTestCase
 
     public function testStatusCode()
     {
-        $this->open('http://localhost/foo.bar.html');
+        $this->open('html/test_open.html');
+        $this->assertEquals(200,$this->statusCode());
 
-        $this->assertEquals(404,$this->statusCode());
-        $this->assertStatusCode('404', $this->statusCode());
-        $this->assertStatusCode(404, $this->statusCode());
+        $this->markTestIncomplete('should get status when not connected');
     }
 }
 
