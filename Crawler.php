@@ -20,12 +20,26 @@ use Symfony\Component\DomCrawler\Crawler as BaseCrawler;
  */
 class Crawler extends BaseCrawler
 {
+    public function filter($selector)
+    {
+        try{
+            return parent::filter($selector);
+        }catch(\Exception $e){
+            throw new CrawlerFilterException('phpunit.selector_malformed',$selector);
+        }
+    }
+
+    /**
+     * Get text form of this node
+     * @return string a text
+     */
     public function text()
     {
         return trim(parent::text());
     }
 
     /**
+     * Get element by ID
      * @param   string $id
      * @return  \toolbox\phpunit\Crawler
      */
@@ -39,6 +53,7 @@ class Crawler extends BaseCrawler
     }
 
     /**
+     * Get element by CSS Class
      * @param   string $class
      * @return  \toolbox\phpunit\Crawler
      */
@@ -51,6 +66,7 @@ class Crawler extends BaseCrawler
     }
 
     /**
+     * Get element by name
      * @param   string $name
      * @return  \toolbox\phpunit\Crawler
      */
@@ -60,8 +76,30 @@ class Crawler extends BaseCrawler
         if (!is_null($element)) {
             $selector = $element . $selector;
         }
+        try{
+            return $this->filter($selector);
+        }catch(\Exception $e){
+            throw new CrawlerFilterException('phpunit.selector_malformed',$selector);
+        }
+    }
 
-        return $this->filter($selector);
+    /**
+     * Check if element present
+     * @param   string      $selector
+     * @return  boolean     True if element present
+     */
+    public function hasElement($selector)
+    {
+        if($this->filter($selector)->count()>0){
+            return true;
+        }elseif($this->byId($selector)->count()>0){
+            return true;
+        }elseif(strpos($selector,'#') !== 0 && $this->byName($selector)->count()>0){
+            return true;
+        }elseif($this->byCssClass($selector)->count()>0){
+            return true;
+        }
+        return false;
     }
 }
 

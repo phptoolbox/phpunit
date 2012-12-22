@@ -40,7 +40,13 @@ class WebTestCaseTest extends BaseTestCase
         $this->open('html/test_open.html');
         $this->assertEquals(200,$this->statusCode());
 
-        $this->markTestIncomplete('should return status when not found');
+        $this->open('foo/bar');
+
+        $server = strtolower($this->getBrowser()->getResponse()->getHeader('server'));
+        if(false===strpos($server,'apache')){
+            $this->markTestSkipped();
+        }
+        $this->assertEquals(404,$this->statusCode());
     }
 
     public function testShouldSelectElementById()
@@ -76,6 +82,26 @@ class WebTestCaseTest extends BaseTestCase
         $this->assertTrue($element->count() > 0);
     }
 
+    /**
+     * @dataProvider getVerifyElement
+     */
+    public function testShouldVerifyElementPresent($expected,$selector)
+    {
+        $this->open('html/test_element_selection.html');
+        $this->assertEquals($expected,$this->hasElement($selector));
+    }
+
+    public function getVerifyElement()
+    {
+        return array(
+            array(true,'theDivName'),
+            array(false,'#theDivName'),
+            array(true,'theDivId'),
+            array(true,'theDivClass'),
+            array(true,'.theDivClass'),
+            array(false,'foodiv'),
+        );
+    }
 }
 
 ?>

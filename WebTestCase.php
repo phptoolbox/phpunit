@@ -23,6 +23,7 @@ use toolbox\phpunit\Browser;
  * @method \toolbox\phpunit\Crawler byId(string $id) Filter the list of node by Element id
  * @method \toolbox\phpunit\Crawler byCssClass(string $class) Filter the list of node by CSS Class
  * @method \toolbox\phpunit\Crawler byName(string $name,string $element) Filter the list of node by their name.
+ * @method boolean hasElement(string $selector) Check if response content has element by the given selector
  * @author Anthonius Munthi <me@itstoni.com>
  */
 class WebTestCase extends PHPUnit_Framework_TestCase
@@ -93,10 +94,16 @@ class WebTestCase extends PHPUnit_Framework_TestCase
         $this->assertContains($expected, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
     }
 
-    public function assertStatusCode($expected,$message)
+    public function assertStatusCode($expected,$message="")
     {
         $this->assertEquals($expected,$this->getBrowser()->getResponse()->getStatus(),$message);
     }
+
+    public function assertElementPresent($selector,$message="")
+    {
+        $this->assertTrue($this->hasElement($selector),$message);
+    }
+    
     public function __call($name, $arguments)
     {
         $crawler = $this->crawler;
