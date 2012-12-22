@@ -23,7 +23,11 @@ class Browser extends Client
 {
     public function open($uri = null, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
     {
-        return $this->request('GET', $uri, $parameters, $files, $server, $content, $changeHistory);
+        try{
+            return $this->request('GET', $uri, $parameters, $files, $server, $content, $changeHistory);
+        }catch(\Exception $e){
+            throw $e;
+        }
     }
 
     /**

@@ -20,7 +20,9 @@ use toolbox\phpunit\Browser;
  *
  * @method \toolbox\phpunit\Crawler filter(string $selector) Filters the list of nodes with a CSS selector.
  * @method \toolbox\phpunit\Crawler filterXPath(string $selector) Filters the list of nodes with an XPath expression.
- * @method integer statusCode() Get HTTP Response Status Code
+ * @method \toolbox\phpunit\Crawler byId(string $id) Filter the list of node by Element id
+ * @method \toolbox\phpunit\Crawler byCssClass(string $class) Filter the list of node by CSS Class
+ * @method \toolbox\phpunit\Crawler byName(string $name,string $element) Filter the list of node by their name.
  * @author Anthonius Munthi <me@itstoni.com>
  */
 class WebTestCase extends PHPUnit_Framework_TestCase
