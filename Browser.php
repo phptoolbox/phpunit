@@ -21,13 +21,10 @@ use toolbox\phpunit\Crawler;
  */
 class Browser extends Client
 {
+
     public function open($uri = null, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
     {
-        try{
-            return $this->request('GET', $uri, $parameters, $files, $server, $content, $changeHistory);
-        }catch(\Exception $e){
-            throw $e;
-        }
+        return $this->request('GET', $uri, $parameters, $files, $server, $content, $changeHistory);
     }
 
     /**
@@ -44,7 +41,7 @@ class Browser extends Client
     protected function createCrawlerFromContent($uri, $content, $type)
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
-            return null;
+            return null; //@codeCoverageIgnore
         }
         $crawler = new Crawler(null, $uri);
         $crawler->addContent($content, $type);

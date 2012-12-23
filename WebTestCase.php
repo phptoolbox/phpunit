@@ -103,15 +103,13 @@ class WebTestCase extends PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->hasElement($selector),$message);
     }
-    
+
     public function __call($name, $arguments)
     {
         $crawler = $this->crawler;
         if(is_object($crawler) && method_exists($crawler, $name)){
             return call_user_func_array(array($crawler,$name), $arguments);
         }
-
-        $this->markTestIncomplete("Method not exists: ".__CLASS__.'::'.$name);
     }
 }
 
